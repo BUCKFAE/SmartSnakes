@@ -1,0 +1,3 @@
+"""
+Handles the Snake Game
+"""
