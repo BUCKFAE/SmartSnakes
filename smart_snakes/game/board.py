@@ -7,9 +7,9 @@ Handles the snake and movement
 from __future__ import annotations
 
 import random
-import numpy as np
-
 from dataclasses import dataclass
+
+import numpy as np
 
 from smart_snakes.game.directions.absolute_direction import AbsoluteDirection
 from smart_snakes.game.directions.relative_direction import RelativeDirection

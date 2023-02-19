@@ -15,5 +15,6 @@ def main():
     logger.info(f'Board size: {sample_board.get_size()}')
     logger.info(f'Sample board:\n{sample_board}')
 
+
 if __name__ == '__main__':
     main()
