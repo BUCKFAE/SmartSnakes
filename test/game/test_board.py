@@ -3,6 +3,7 @@ import unittest
 from smart_snakes.game.board import Board
 from smart_snakes.game.point import Point
 from smart_snakes.game.tile import Tile
+from smart_snakes.log.snake_logger import logger
 
 
 class TestBoard(unittest.TestCase):
@@ -13,7 +14,7 @@ class TestBoard(unittest.TestCase):
 
     def test_board_operations(self):
         b = Board(7, 9, 3)
-        print(b)
+        logger.info(f'Test board:\n{b}')
 
         # Snake only spawns in the 4th row
         for y in range(9):
@@ -56,7 +57,7 @@ class TestBoard(unittest.TestCase):
 
     def test_snake_movement(self):
         b = Board(7, 9, 3)
-        print(b)
+        logger.info(f'Test board:\n{b}')
 
         # Moving the snake forward twice until it is at the wall
 

@@ -15,6 +15,7 @@ from smart_snakes.game.directions.absolute_direction import AbsoluteDirection
 from smart_snakes.game.directions.relative_direction import RelativeDirection
 from smart_snakes.game.point import Point
 from smart_snakes.game.tile import Tile
+from smart_snakes.log.snake_logger import logger
 
 
 @dataclass
@@ -93,7 +94,7 @@ class Board:
     def spawn_new_food(self) -> Point:
         while True:
             food_pos = Point(random.randint(0, self.get_size()[0] - 1), random.randint(0, self.get_size()[1] - 1))
-            print(f'Spawned food: {food_pos}')
+            logger.info(f'Spawned food at {food_pos}')
             if self.is_empty(food_pos):
                 break
         self.set_tile(food_pos, Tile.FOOD)
