@@ -68,7 +68,53 @@ class Board:
         :returns: SnakeEvent storing everything notable that occurred
         """
 
-        raise NotImplementedError
+        move_dir: AbsoluteDirection
+        if type(direction) == RelativeDirection:
+            move_dir = self.target_dir.relative(direction)
+        else:
+            move_dir = direction
+
+        logger.info(f'Moving snake: {move_dir}')
+        next_tile = self.snake_coords[-1].get_point_in_direction(move_dir)
+        logger.info(f'Next tile: {move_dir}')
+
+        # Snake hit a wall
+        if not self.is_in_bounds(next_tile):
+            logger.info(f'Snake hit a wall: {next_tile}')
+            return SnakeEvent(False, False)
+
+        # Snake hit itself
+        if self.get_tile(next_tile) == Tile.BODY:
+            logger.info(f'Snake hit itself: {next_tile}')
+            return SnakeEvent(False, False)
+
+        # Snake ate food
+        ate_food = self.get_tile(next_tile) == Tile.FOOD
+        logger.info(f'Snake ate food: {ate_food}')
+
+        # Setting old head as body tile
+        self.set_tile(self.snake_coords[-1], Tile.BODY)
+
+        # New head tile
+        self.set_tile(next_tile, Tile.HEAD)
+        self.snake_coords.append(next_tile)
+
+        if not ate_food:
+            self.set_tile(self.snake_coords[0], Tile.EMPTY)
+            self.snake_coords = self.snake_coords[1:]
+        else:
+            self.spawn_new_food()
+
+        self.target_dir = move_dir
+
+        logger.info(f'New head: {self.snake_coords[-1]}')
+        logger.info(f'Board:\n{self.__str__()}')
+
+        return SnakeEvent(True, ate_food)
+
+    def is_in_bounds(self, pos: Point) -> bool:
+        size_x, size_y = self.get_size()
+        return 0 <= pos.x < size_x and 0 <= pos.y < size_y
 
     def is_empty(self, pos: Point) -> bool:
         return self._board[pos.y][pos.x] == Tile.EMPTY.value
@@ -76,20 +122,15 @@ class Board:
     def get_tile(self, pos: Point) -> Tile:
         return Tile(self._board[pos.y][pos.x])
 
-    def clear_tile(self, pos: Point):
-        """Removes the tile at the given point
-        Fails if nothing was on this tile previously
-        """
-        assert not self.is_empty(pos), f'Can not clear empty tile'
-        self._board[pos.y][pos.x] = Tile.EMPTY.value
-
     def set_tile(self, pos: Point, tile: Tile):
         """Sets tile at the given pos
-        Fails if the tile was not empty
         """
-        assert self.is_empty(pos)
-        assert tile is not Tile.EMPTY, f'Can not set non-empty tile'
         self._board[pos.y][pos.x] = tile.value
+
+    def set_food_pos(self, pos: Point):
+        self._board[self._board == Tile.FOOD.value] = Tile.EMPTY.value
+        self.set_tile(pos, Tile.FOOD)
+        self.food_pos = pos
 
     def spawn_new_food(self) -> Point:
         while True:
@@ -97,7 +138,7 @@ class Board:
             logger.info(f'Spawned food at {food_pos}')
             if self.is_empty(food_pos):
                 break
-        self.set_tile(food_pos, Tile.FOOD)
+        self.set_food_pos(food_pos)
         return food_pos
 
     def get_food_pos(self) -> Point:
